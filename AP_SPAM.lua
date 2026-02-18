@@ -139,14 +139,11 @@ local function spam(targetName)
     
     -- Le reste (tiny, inverse) avec 0.12s entre eux
     task.wait(0.12)
-    ch:SendAsync(";tiny " .. targetName)
-    
-    task.wait(0.15)
     ch:SendAsync(";inverse " .. targetName)
     
-    -- Jail après 0.2s (assumant que c'est 0.2s, pas ms)
-    task.wait(3.3)
-    ch:SendAsync(";jail " .. targetName)
+    task.wait(0.12)
+    ch:SendAsync(";tiny " .. targetName)
+    
 end
 
 -- Touche F = exécuter sélectionné
