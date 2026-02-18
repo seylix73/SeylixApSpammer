@@ -10,7 +10,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 8)
 local selectedPlayerName = nil
 local selectedBtn = nil
 
--- GUI stylée
+-- GUI
 local sg = Instance.new("ScreenGui")
 sg.Name = "SeylixAP"
 sg.ResetOnSpawn = false
@@ -18,119 +18,70 @@ sg.IgnoreGuiInset = true
 sg.Parent = lp:WaitForChild("PlayerGui")
 
 local mf = Instance.new("Frame")
-mf.Size = UDim2.new(0.38, 0, 0.42, 0)  -- un peu plus haut pour esthétique
+mf.Size = UDim2.new(0.38, 0, 0.38, 0)  -- taille fixe, ne change jamais
 mf.Position = UDim2.new(0.5, 0, 0.5, 0)
 mf.AnchorPoint = Vector2.new(0.5, 0.5)
-mf.BackgroundColor3 = Color3.fromRGB(15, 15, 20)  -- noir mat profond
-mf.BorderSizePixel = 0
+mf.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
 mf.Parent = sg
 
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 16)  -- coins plus arrondis
+corner.CornerRadius = UDim.new(0, 12)
 corner.Parent = mf
 
--- Ombre légère
-local shadow = Instance.new("ImageLabel")
-shadow.Size = UDim2.new(1, 20, 1, 20)
-shadow.Position = UDim2.new(0, -10, 0, -10)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217"  -- ombre Roblox classique
-shadow.ImageTransparency = 0.7
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10,10,118,118)
-shadow.Parent = mf
-shadow.ZIndex = -1
-
 local aspect = Instance.new("UIAspectRatioConstraint")
-aspect.AspectRatio = 1.0  -- plus carré, plus moderne
+aspect.AspectRatio = 1.05
 aspect.Parent = mf
 
 local titleBar = Instance.new("Frame")
-titleBar.Size = UDim2.new(1,0,0,36)  -- barre plus haute
-titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
-titleBar.BorderSizePixel = 0
+titleBar.Size = UDim2.new(1,0,0,28)
+titleBar.BackgroundColor3 = Color3.fromRGB(22,22,22)
 titleBar.Parent = mf
 
-local titleBarCorner = Instance.new("UICorner")
-titleBarCorner.CornerRadius = UDim.new(0, 16)
-titleBarCorner.Parent = titleBar
-
--- Drapeau algérien (à gauche)
-local flag = Instance.new("ImageLabel")
-flag.Size = UDim2.new(0, 32, 0, 24)
-flag.Position = UDim2.new(0, 12, 0.5, -12)
-flag.BackgroundTransparency = 1
-flag.Image = "rbxassetid://6239941415"  -- ID public drapeau Algérie (vert-blanc-rouge + croissant)
-flag.ScaleType = Enum.ScaleType.Fit
-flag.Parent = titleBar
-
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -60, 1, 0)
-title.Position = UDim2.new(0, 55, 0, 0)
+title.Size = UDim2.new(0.82,0,1,0)
+title.Position = UDim2.new(0.03,0,0,0)
 title.BackgroundTransparency = 1
 title.Text = "Seylix AP"
 title.TextScaled = true
-title.Font = Enum.Font.GothamBlack
+title.Font = Enum.Font.GothamBold
 title.TextColor3 = Color3.fromRGB(255,255,255)
-title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
--- Animation arc-en-ciel plus douce
 local hue = 0
 RS.Heartbeat:Connect(function(dt)
-    hue = (hue + dt * 45) % 360  -- plus lent et élégant
-    title.TextColor3 = Color3.fromHSV(hue/360, 0.9, 1)
+    hue = (hue + dt * 90) % 360
+    title.TextColor3 = Color3.fromHSV(hue/360, 0.95, 1)
 end)
 
 local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 32, 0, 32)
-minBtn.Position = UDim2.new(1, -40, 0.5, -16)
-minBtn.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+minBtn.Size = UDim2.new(0.16,0,0.8,0)
+minBtn.Position = UDim2.new(1,-6,0.1,0)
+minBtn.AnchorPoint = Vector2.new(1,0)
 minBtn.Text = "-"
-minBtn.TextColor3 = Color3.fromRGB(200,200,255)
 minBtn.TextScaled = true
-minBtn.Font = Enum.Font.GothamBold
+minBtn.BackgroundColor3 = Color3.fromRGB(45,45,45)
 minBtn.Parent = titleBar
 
-local minCorner = Instance.new("UICorner")
-minCorner.CornerRadius = UDim.new(1,0)  -- cercle parfait
-minCorner.Parent = minBtn
-
--- Bouton Exécuter stylé
+-- Bouton Exécuter (fixe en bas, visible toujours)
 local execBtn = Instance.new("TextButton")
-execBtn.Size = UDim2.new(0.92, 0, 0.16, 0)
-execBtn.Position = UDim2.new(0.04, 0, 0.82, 0)  -- en bas fixe
-execBtn.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
-execBtn.Text = "EXÉCUTER (F)"
+execBtn.Size = UDim2.new(0.92,0,0.18,0)
+execBtn.Position = UDim2.new(0.04, 0, 0.78, 0)  -- positionné en bas de la frame fixe
+execBtn.BackgroundColor3 = Color3.fromRGB(200,30,30)
+execBtn.Text = "Exécuter sur sélectionné (F)"
 execBtn.TextScaled = true
 execBtn.Font = Enum.Font.GothamBlack
-execBtn.TextColor3 = Color3.fromRGB(255,255,255)
 execBtn.Parent = mf
 
-local execCorner = Instance.new("UICorner")
-execCorner.CornerRadius = UDim.new(0, 12)
-execCorner.Parent = execBtn
-
--- Gradient rouge → orange sur execBtn
-local execGradient = Instance.new("UIGradient")
-execGradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(220,40,40)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(255,140,0))
-}
-execGradient.Rotation = 45
-execGradient.Parent = execBtn
-
--- ScrollingFrame
+-- Liste (disparaît au minimize)
 local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(1, -20, 0.58, -50)  -- ajusté pour esthétique
-scroll.Position = UDim2.new(0, 10, 0.18, 0)
+scroll.Size = UDim2.new(1,-12,0.55,0)
+scroll.Position = UDim2.new(0,6,0.2,0)
 scroll.BackgroundTransparency = 1
-scroll.ScrollBarThickness = 4
-scroll.ScrollBarImageColor3 = Color3.fromRGB(80,80,200)
+scroll.ScrollBarThickness = 3
 scroll.Parent = mf
 
 local scrollList = Instance.new("UIListLayout")
-scrollList.Padding = UDim.new(0.008, 0)
+scrollList.Padding = UDim.new(0.006,0)
 scrollList.Parent = scroll
 
 -- Drag
@@ -156,17 +107,12 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize : taille fixe, seule liste disparaît
+-- Minimize : taille mf INCHANGÉE, seule scroll disparaît
 local minimized = false
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
-    if minimized then
-        scroll.Visible = false
-        minBtn.Text = "+"
-    else
-        scroll.Visible = true
-        minBtn.Text = "-"
-    end
+    scroll.Visible = not minimized
+    minBtn.Text = minimized and "+" or "-"
 end)
 
 -- Spam
@@ -199,54 +145,56 @@ execBtn.MouseButton1Click:Connect(function()
     if selectedPlayerName then spam(selectedPlayerName) end
 end)
 
--- Boutons joueurs (plus stylés)
+-- Création boutons
 local function createBtn(p)
     if p == lp then return end
     local b = Instance.new("TextButton")
-    b.Size = UDim2.new(1,0,0,34)  -- boutons plus hauts
-    b.BackgroundColor3 = Color3.fromRGB(30,30,45)
-    b.TextColor3 = Color3.fromRGB(220,220,255)
+    b.Size = UDim2.new(1,0,0,26)
+    b.BackgroundColor3 = Color3.fromRGB(28,28,28)
+    b.TextColor3 = Color3.fromRGB(230,230,230)
     b.TextScaled = true
     b.Font = Enum.Font.GothamSemibold
     b.Text = p.Name
     b.Parent = scroll
-    
-    local bc = Instance.new("UICorner")
-    bc.CornerRadius = UDim.new(0,10)
-    bc.Parent = b
+    local c = Instance.new("UICorner")
+    c.CornerRadius = UDim.new(0,8)
+    c.Parent = b
+    local pad = Instance.new("UIPadding")
+    pad.PaddingTop = UDim.new(0.04,0)
+    pad.PaddingBottom = UDim.new(0.04,0)
+    pad.Parent = b
     
     b.MouseButton1Click:Connect(function()
         selectedPlayerName = p.Name
-        if selectedBtn then 
-            selectedBtn.BackgroundColor3 = Color3.fromRGB(30,30,45) 
-        end
-        b.BackgroundColor3 = Color3.fromRGB(60,80,180)  -- bleu-violet sélection
+        if selectedBtn then selectedBtn.BackgroundColor3 = Color3.fromRGB(28,28,28) end
+        b.BackgroundColor3 = Color3.fromRGB(50,50,100)
         selectedBtn = b
     end)
 end
 
--- Refresh
+-- Refresh sélection persistante
 local function refresh()
-    local prev = selectedPlayerName
+    local previouslySelectedName = selectedPlayerName
     
     for _,c in scroll:GetChildren() do 
         if c:IsA("TextButton") then c:Destroy() end 
     end
     
-    for _,p in Players:GetPlayers() do 
+    local pls = Players:GetPlayers()
+    for _,p in pls do 
         createBtn(p) 
     end
     
-    if prev then
-        local exists = Players:FindFirstChild(prev) ~= nil
-        if exists then
-            selectedPlayerName = prev
+    if previouslySelectedName then
+        local stillExists = Players:FindFirstChild(previouslySelectedName) ~= nil
+        if stillExists then
+            selectedPlayerName = previouslySelectedName
             for _, b in scroll:GetChildren() do
-                if b:IsA("TextButton") and b.Text == prev then
+                if b:IsA("TextButton") and b.Text == previouslySelectedName then
                     if selectedBtn then
-                        selectedBtn.BackgroundColor3 = Color3.fromRGB(30,30,45)
+                        selectedBtn.BackgroundColor3 = Color3.fromRGB(28,28,28)
                     end
-                    b.BackgroundColor3 = Color3.fromRGB(60,80,180)
+                    b.BackgroundColor3 = Color3.fromRGB(50,50,100)
                     selectedBtn = b
                     break
                 end
@@ -273,4 +221,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Version esthétique + drapeau Algérie")
+print("Seylix AP - Minimize fixe : taille identique, liste cache seulement")
