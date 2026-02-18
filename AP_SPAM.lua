@@ -9,7 +9,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 8)
 
 local selectedPlayerName = nil
 
--- GUI
+-- GUI compact
 local sg = Instance.new("ScreenGui")
 sg.Name = "SeylixAP"
 sg.ResetOnSpawn = false
@@ -65,8 +65,9 @@ minBtn.TextScaled = true
 minBtn.BackgroundColor3 = Color3.fromRGB(45,45,45)
 minBtn.Parent = titleBar
 
+-- Bouton Exécuter (taille fixe, reste grand même minimisé)
 local execBtn = Instance.new("TextButton")
-execBtn.Size = UDim2.new(0.92,0,0.18,0)
+execBtn.Size = UDim2.new(0.92,0,0.18,0)           -- taille fixe
 execBtn.BackgroundColor3 = Color3.fromRGB(200,30,30)
 execBtn.Text = "Exécuter sur sélectionné (F)"
 execBtn.TextScaled = true
@@ -107,14 +108,14 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize : liste disparaît, bouton reste grand
+-- Minimize : liste disparaît, bouton Exécuter reste grand
 local minimized = false
 local norm = mf.Size
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     if minimized then
         scroll.Visible = false
-        mf.Size = UDim2.new(0.38, 0, 0.18, 0)
+        mf.Size = UDim2.new(0.38, 0, 0.18, 0)   -- petit, mais bouton Exécuter garde sa taille complète
         minBtn.Text = "+"
     else
         scroll.Visible = true
@@ -123,7 +124,7 @@ minBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Spam chat ultra rapide (zéro délai)
+-- Spam rapide (petit délai pour éviter "Ne pas envoyer trop de messages")
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
@@ -138,8 +139,9 @@ local function spam(targetName)
         ";jail " .. targetName
     }
 
-    for _,c in cmds do
+    for _,c in ipairs(cmds) do
         ch:SendAsync(c)
+        task.wait(0.04)  -- 40 ms = très rapide mais passe l'anti-flood Roblox
     end
 end
 
@@ -206,4 +208,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Version CHAT (zéro délai)")
+print("Seylix AP - Bouton Exécuter grand même minimisé")
