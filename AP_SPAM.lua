@@ -1,5 +1,6 @@
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
+local TCS = game:GetService("TextChatService")
 local RS = game:GetService("RunService")
 
 local lp = Players.LocalPlayer
@@ -8,16 +9,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 8)
 
 local selectedPlayerName = nil
 
--- CONFIG REMOTE (change le nom ici une fois trouvé !)
-local REMOTE_PATH = game:GetService("ReplicatedStorage")  -- ou ReplicatedStorage.Events si besoin
-local REMOTE_NAME = "AdminCommand"                        -- ← CHANGE ÇA ! (ex: "Command", "ExecuteCommand", "AdminRemote", "RemoteHandler")
-
-local remote = REMOTE_PATH:FindFirstChild(REMOTE_NAME)
-if not remote then
-    warn("Remote '" .. REMOTE_NAME .. "' non trouvé ! Vérifie le nom dans ReplicatedStorage")
-end
-
--- GUI (identique, compact)
+-- GUI
 local sg = Instance.new("ScreenGui")
 sg.Name = "SeylixAP"
 sg.ResetOnSpawn = false
@@ -131,32 +123,23 @@ minBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Spam via REMOTE (ultra rapide)
+-- Spam chat ultra rapide (zéro délai)
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
-    local target = Players:FindFirstChild(targetName)
-    if not target then return end
+    local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
+    if not ch then warn("Canal introuvable") return end
 
-    if not remote then
-        warn("Remote '" .. REMOTE_NAME .. "' non trouvé !")
-        return
-    end
-
-    -- Ordre exact que tu veux
     local cmds = {
-        "balloon",
-        "rocket",
-        "tiny",
-        "inverse",
-        "jail"
+        ";balloon " .. targetName,
+        ";rocket " .. targetName,
+        ";tiny " .. targetName,
+        ";inverse " .. targetName,
+        ";jail " .. targetName
     }
 
-    for _, cmd in ipairs(cmds) do
-        pcall(function()
-            remote:FireServer(cmd, target)  -- format courant : commande + joueur
-            -- Si le remote veut une string : remote:FireServer(cmd .. " " .. targetName)
-        end)
+    for _,c in cmds do
+        ch:SendAsync(c)
     end
 end
 
@@ -223,4 +206,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Mode REMOTES activé")
+print("Seylix AP - Version CHAT (zéro délai)")
