@@ -124,25 +124,30 @@ minBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Spam rapide (petit délai pour éviter "Ne pas envoyer trop de messages")
+-- Spam avec délais personnalisés
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
     local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
     if not ch then warn("Canal introuvable") return end
 
-    local cmds = {
-        ";balloon " .. targetName,
-        ";rocket " .. targetName,
-        ";tiny " .. targetName,
-        ";inverse " .. targetName,
-        ";jail " .. targetName
-    }
-
-    for _,c in ipairs(cmds) do
-        ch:SendAsync(c)
-        task.wait(0.04)  -- 40 ms = très rapide mais passe l'anti-flood Roblox
-    end
+    -- Balloon immédiat (0ms)
+    ch:SendAsync(";balloon " .. targetName)
+    
+    -- Rocket après 0.01s
+    task.wait(0.01)
+    ch:SendAsync(";rocket " .. targetName)
+    
+    -- Le reste (tiny, inverse) avec 0.12s entre eux
+    task.wait(0.12)
+    ch:SendAsync(";tiny " .. targetName)
+    
+    task.wait(0.12)
+    ch:SendAsync(";inverse " .. targetName)
+    
+    -- Jail après 0.2s (assumant que c'est 0.2s, pas ms)
+    task.wait(0.2)
+    ch:SendAsync(";jail " .. targetName)
 end
 
 -- Touche F = exécuter sélectionné
