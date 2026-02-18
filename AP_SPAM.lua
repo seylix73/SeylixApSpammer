@@ -8,6 +8,7 @@ local char = lp.Character or lp.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart", 8)
 
 local selectedPlayerName = nil
+local selectedBtn = nil
 
 -- GUI compact
 local sg = Instance.new("ScreenGui")
@@ -67,7 +68,7 @@ minBtn.Parent = titleBar
 
 -- Bouton Exécuter (taille fixe, reste grand même minimisé)
 local execBtn = Instance.new("TextButton")
-execBtn.Size = UDim2.new(0.92,0,0.18,0)           -- taille fixe
+execBtn.Size = UDim2.new(0.92,0,0.18,0)
 execBtn.BackgroundColor3 = Color3.fromRGB(200,30,30)
 execBtn.Text = "Exécuter sur sélectionné (F)"
 execBtn.TextScaled = true
@@ -108,14 +109,14 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize : liste disparaît, bouton Exécuter reste grand
+-- Minimize
 local minimized = false
 local norm = mf.Size
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     if minimized then
         scroll.Visible = false
-        mf.Size = UDim2.new(0.38, 0, 0.18, 0)   -- petit, mais bouton Exécuter garde sa taille complète
+        mf.Size = UDim2.new(0.38, 0, 0.18, 0)
         minBtn.Text = "+"
     else
         scroll.Visible = true
@@ -124,29 +125,24 @@ minBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- Spam avec délais personnalisés
+-- Spam function
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
     local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
     if not ch then warn("Canal introuvable") return end
 
-    -- Balloon immédiat (0ms)
     ch:SendAsync(";balloon " .. targetName)
-    
-    -- Rocket après 0.01s
     ch:SendAsync(";rocket " .. targetName)
     
-    -- Le reste (tiny, inverse) avec 0.12s entre eux
     task.wait(0.12)
     ch:SendAsync(";inverse " .. targetName)
     
     task.wait(0.12)
     ch:SendAsync(";tiny " .. targetName)
-    
 end
 
--- Touche F = exécuter sélectionné
+-- Touche F
 UIS.InputBegan:Connect(function(i,gp)
     if gp then return end
     if i.KeyCode == Enum.KeyCode.F then
@@ -159,8 +155,7 @@ execBtn.MouseButton1Click:Connect(function()
     if selectedPlayerName then spam(selectedPlayerName) end
 end)
 
--- Boutons sélection
-local selectedBtn = nil
+-- Création bouton joueur
 local function createBtn(p)
     if p == lp then return end
     local b = Instance.new("TextButton")
@@ -187,26 +182,61 @@ local function createBtn(p)
     end)
 end
 
--- Refresh
+-- Refresh avec conservation de la sélection
 local function refresh()
-    for _,c in scroll:GetChildren() do if c:IsA("TextButton") then c:Destroy() end end
+    local previouslySelectedName = selectedPlayerName
+    
+    for _,c in scroll:GetChildren() do 
+        if c:IsA("TextButton") then c:Destroy() end 
+    end
     
     local pls = Players:GetPlayers()
-    for _,p in pls do createBtn(p) end
+    for _,p in pls do 
+        createBtn(p) 
+    end
     
-    task.delay(0.3, function()
+    if previouslySelectedName then
+        local stillExists = false
+        for _, p in pls do
+            if p.Name == previouslySelectedName then
+                stillExists = true
+                break
+            end
+        end
+        
+        if stillExists then
+            selectedPlayerName = previouslySelectedName
+            for _, b in scroll:GetChildren() do
+                if b:IsA("TextButton") and b.Text == previouslySelectedName then
+                    if selectedBtn then
+                        selectedBtn.BackgroundColor3 = Color3.fromRGB(28,28,28)
+                    end
+                    b.BackgroundColor3 = Color3.fromRGB(50,50,100)
+                    selectedBtn = b
+                    break
+                end
+            end
+        else
+            selectedPlayerName = nil
+            selectedBtn = nil
+        end
+    end
+    
+    task.delay(0.05, function()
         scroll.CanvasSize = UDim2.new(0,0,0, scrollList.AbsoluteContentSize.Y + 20)
     end)
 end
 
+-- Initialisation
 refresh()
 task.delay(1, refresh)
 
 Players.PlayerAdded:Connect(refresh)
 Players.PlayerRemoving:Connect(refresh)
+
 lp.CharacterAdded:Connect(function(nc)
     char = nc
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Bouton Exécuter grand même minimisé")
+print("Seylix AP - Sélection persistante corrigée")
