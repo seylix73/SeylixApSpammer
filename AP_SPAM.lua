@@ -135,10 +135,10 @@ local function spam(targetName)
     ch:SendAsync(";balloon " .. targetName)
     ch:SendAsync(";rocket " .. targetName)
     
-    task.wait(0.12)
+    task.wait(0.09)
     ch:SendAsync(";inverse " .. targetName)
     
-    task.wait(0.12)
+    task.wait(0.09)
     ch:SendAsync(";tiny " .. targetName)
 end
 
