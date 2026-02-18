@@ -18,7 +18,7 @@ sg.IgnoreGuiInset = true
 sg.Parent = lp:WaitForChild("PlayerGui")
 
 local mf = Instance.new("Frame")
-mf.Size = UDim2.new(0.38, 0, 0.38, 0)  -- taille fixe
+mf.Size = UDim2.new(0.38, 0, 0.38, 0)
 mf.Position = UDim2.new(0.5, 0, 0.5, 0)
 mf.AnchorPoint = Vector2.new(0.5, 0.5)
 mf.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
@@ -62,7 +62,6 @@ local titleBarCorner = Instance.new("UICorner")
 titleBarCorner.CornerRadius = UDim.new(0, 16)
 titleBarCorner.Parent = titleBar
 
--- Drapeau Algérie
 local flag = Instance.new("ImageLabel")
 flag.Size = UDim2.new(0, 40, 0, 30)
 flag.Position = UDim2.new(0, 15, 0.5, -15)
@@ -102,7 +101,6 @@ local minCorner = Instance.new("UICorner")
 minCorner.CornerRadius = UDim.new(1,0)
 minCorner.Parent = minBtn
 
--- Bouton Exécuter
 local execBtn = Instance.new("TextButton")
 execBtn.Size = UDim2.new(0.92, 0, 0.18, 0)
 execBtn.Position = UDim2.new(0.04, 0, 0.78, 0)
@@ -125,15 +123,14 @@ execGradient.Color = ColorSequence.new{
 execGradient.Rotation = 45
 execGradient.Parent = execBtn
 
--- ScrollingFrame avec scroll automatique
+-- ScrollingFrame sans AutomaticCanvasSize (buggé)
 local scroll = Instance.new("ScrollingFrame")
 scroll.Size = UDim2.new(1, -20, 0.58, -60)
 scroll.Position = UDim2.new(0, 10, 0.18, 10)
 scroll.BackgroundTransparency = 1
 scroll.ScrollBarThickness = 4
 scroll.ScrollBarImageColor3 = Color3.fromRGB(100,100,220)
-scroll.AutomaticCanvasSize = Enum.AutomaticSize.Y
-scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)  -- on met à jour manuellement
 scroll.ScrollingDirection = Enum.ScrollingDirection.Y
 scroll.Parent = mf
 
@@ -199,12 +196,11 @@ UIS.InputBegan:Connect(function(i,gp)
     end
 end)
 
--- Bouton Exécuter
 execBtn.MouseButton1Click:Connect(function()
     if selectedPlayerName then spam(selectedPlayerName) end
 end)
 
--- Boutons joueurs
+-- Boutons
 local function createBtn(p)
     if p == lp then return end
     local b = Instance.new("TextButton")
@@ -239,7 +235,7 @@ local function createBtn(p)
     end)
 end
 
--- Refresh
+-- Refresh corrigé
 local function refresh()
     local prevName = selectedPlayerName
     
@@ -265,6 +261,10 @@ local function refresh()
         selectedPlayerName = nil
         selectedBtn = nil
     end
+    
+    -- Mise à jour CanvasSize manuelle avec délai (fixe le bug "un seul joueur")
+    task.wait(0.1)  -- 0.1s suffisant pour AbsoluteContentSize à jour
+    scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 40)  -- +40 marge
 end
 
 refresh()
@@ -278,4 +278,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Version finale : scroll auto, minimize fixe, esthétique + drapeau Algérie")
+print("Seylix AP - Liste complète + scroll jusqu'en bas corrigé")
