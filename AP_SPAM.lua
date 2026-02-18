@@ -1,5 +1,5 @@
--- Seylix AP - Version finale (18 février 2026)
--- Scroll complet corrigé, minimize fixe, esthétique + drapeau Algérie
+-- Seylix AP - Version finale GitHub (18 février 2026)
+-- Liste complète + scroll jusqu'en bas, minimize fixe, esthétique clean, drapeau Algérie
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -13,7 +13,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 8)
 local selectedPlayerName = nil
 local selectedBtn = nil
 
--- GUI
+-- GUI esthétique
 local sg = Instance.new("ScreenGui")
 sg.Name = "SeylixAP"
 sg.ResetOnSpawn = false
@@ -24,32 +24,21 @@ local mf = Instance.new("Frame")
 mf.Size = UDim2.new(0.38, 0, 0.38, 0)
 mf.Position = UDim2.new(0.5, 0, 0.5, 0)
 mf.AnchorPoint = Vector2.new(0.5, 0.5)
-mf.BackgroundColor3 = Color3.fromRGB(10, 10, 18)
+mf.BackgroundColor3 = Color3.fromRGB(18, 18, 25)  -- sombre moderne
 mf.BorderSizePixel = 0
 mf.Parent = sg
 
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0, 16)
+corner.CornerRadius = UDim.new(0, 18)
 corner.Parent = mf
 
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new{
-    ColorSequenceKeypoint.new(0, Color3.fromRGB(20, 20, 40)),
-    ColorSequenceKeypoint.new(1, Color3.fromRGB(10, 10, 18))
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(28, 28, 45)),
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(18, 18, 25))
 }
 gradient.Rotation = 90
 gradient.Parent = mf
-
-local shadow = Instance.new("ImageLabel")
-shadow.Size = UDim2.new(1, 30, 1, 30)
-shadow.Position = UDim2.new(0, -15, 0, -15)
-shadow.BackgroundTransparency = 1
-shadow.Image = "rbxassetid://1316045217"
-shadow.ImageTransparency = 0.6
-shadow.ScaleType = Enum.ScaleType.Slice
-shadow.SliceCenter = Rect.new(10,10,118,118)
-shadow.Parent = mf
-shadow.ZIndex = -1
 
 local aspect = Instance.new("UIAspectRatioConstraint")
 aspect.AspectRatio = 1.0
@@ -57,19 +46,20 @@ aspect.Parent = mf
 
 local titleBar = Instance.new("Frame")
 titleBar.Size = UDim2.new(1,0,0,40)
-titleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 40)
+titleBar.BackgroundColor3 = Color3.fromRGB(30, 30, 45)
 titleBar.BorderSizePixel = 0
 titleBar.Parent = mf
 
 local titleBarCorner = Instance.new("UICorner")
-titleBarCorner.CornerRadius = UDim.new(0, 16)
+titleBarCorner.CornerRadius = UDim.new(0, 18)
 titleBarCorner.Parent = titleBar
 
+-- Drapeau Algérie
 local flag = Instance.new("ImageLabel")
 flag.Size = UDim2.new(0, 40, 0, 30)
 flag.Position = UDim2.new(0, 15, 0.5, -15)
 flag.BackgroundTransparency = 1
-flag.Image = "rbxassetid://9423183864" -- Drapeau Algérie
+flag.Image = "rbxassetid://9423183864"
 flag.ScaleType = Enum.ScaleType.Fit
 flag.Parent = titleBar
 
@@ -80,22 +70,22 @@ title.BackgroundTransparency = 1
 title.Text = "Seylix AP"
 title.TextScaled = true
 title.Font = Enum.Font.GothamBlack
-title.TextColor3 = Color3.fromRGB(255,255,255)
+title.TextColor3 = Color3.fromRGB(240,240,255)
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
 local hue = 0
 RS.Heartbeat:Connect(function(dt)
-    hue = (hue + dt * 40) % 360
+    hue = (hue + dt * 45) % 360
     title.TextColor3 = Color3.fromHSV(hue/360, 0.85, 1)
 end)
 
 local minBtn = Instance.new("TextButton")
 minBtn.Size = UDim2.new(0, 36, 0, 36)
 minBtn.Position = UDim2.new(1, -45, 0.5, -18)
-minBtn.BackgroundColor3 = Color3.fromRGB(50, 50, 70)
+minBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 75)
 minBtn.Text = "-"
-minBtn.TextColor3 = Color3.fromRGB(180,180,255)
+minBtn.TextColor3 = Color3.fromRGB(200,200,255)
 minBtn.TextScaled = true
 minBtn.Font = Enum.Font.GothamBold
 minBtn.Parent = titleBar
@@ -104,11 +94,12 @@ local minCorner = Instance.new("UICorner")
 minCorner.CornerRadius = UDim.new(1,0)
 minCorner.Parent = minBtn
 
+-- Bouton Exécuter
 local execBtn = Instance.new("TextButton")
 execBtn.Size = UDim2.new(0.92, 0, 0.18, 0)
 execBtn.Position = UDim2.new(0.04, 0, 0.78, 0)
 execBtn.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
-execBtn.Text = "EXÉCUTER (F)"
+execBtn.Text = "EXÉCUTER SUR SÉLECTION (F)"
 execBtn.TextScaled = true
 execBtn.Font = Enum.Font.GothamBlack
 execBtn.TextColor3 = Color3.fromRGB(255,255,255)
@@ -128,17 +119,17 @@ execGradient.Parent = execBtn
 
 -- ScrollingFrame
 local scroll = Instance.new("ScrollingFrame")
-scroll.Size = UDim2.new(1, -20, 0.58, -60)
-scroll.Position = UDim2.new(0, 10, 0.18, 10)
+scroll.Size = UDim2.new(1, -16, 0.55, 0)
+scroll.Position = UDim2.new(0, 8, 0.2, 0)
 scroll.BackgroundTransparency = 1
 scroll.ScrollBarThickness = 4
-scroll.ScrollBarImageColor3 = Color3.fromRGB(100,100,220)
+scroll.ScrollBarImageColor3 = Color3.fromRGB(110,110,230)
 scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 scroll.ScrollingDirection = Enum.ScrollingDirection.Y
 scroll.Parent = mf
 
 local scrollList = Instance.new("UIListLayout")
-scrollList.Padding = UDim.new(0.01, 0)
+scrollList.Padding = UDim.new(0.008, 0)
 scrollList.FillDirection = Enum.FillDirection.Vertical
 scrollList.SortOrder = Enum.SortOrder.LayoutOrder
 scrollList.Parent = scroll
@@ -166,7 +157,7 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize
+-- Minimize fixe
 local minimized = false
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
@@ -174,7 +165,7 @@ minBtn.MouseButton1Click:Connect(function()
     minBtn.Text = minimized and "+" or "-"
 end)
 
--- Spam
+-- Spam rapide
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
@@ -210,7 +201,7 @@ local function createBtn(p)
     local b = Instance.new("TextButton")
     b.Size = UDim2.new(1,0,0,32)
     b.BackgroundColor3 = Color3.fromRGB(35,35,50)
-    b.TextColor3 = Color3.fromRGB(220,220,255)
+    b.TextColor3 = Color3.fromRGB(230,230,255)
     b.TextScaled = true
     b.Font = Enum.Font.GothamSemibold
     b.Text = p.Name
@@ -221,7 +212,7 @@ local function createBtn(p)
     bc.Parent = b
     
     b.MouseEnter:Connect(function()
-        b.BackgroundColor3 = Color3.fromRGB(50,50,70)
+        b.BackgroundColor3 = Color3.fromRGB(50,50,75)
     end)
     b.MouseLeave:Connect(function()
         if selectedPlayerName ~= p.Name then
@@ -232,7 +223,7 @@ local function createBtn(p)
     b.MouseButton1Click:Connect(function()
         selectedPlayerName = p.Name
         if selectedBtn then selectedBtn.BackgroundColor3 = Color3.fromRGB(35,35,50) end
-        b.BackgroundColor3 = Color3.fromRGB(70,90,200)
+        b.BackgroundColor3 = Color3.fromRGB(80,90,200)
         selectedBtn = b
     end)
 end
@@ -245,7 +236,8 @@ local function refresh()
         if c:IsA("TextButton") then c:Destroy() end 
     end
     
-    for _,p in Players:GetPlayers() do 
+    local pls = Players:GetPlayers()
+    for _,p in pls do 
         createBtn(p) 
     end
     
@@ -254,7 +246,7 @@ local function refresh()
         for _, b in scroll:GetChildren() do
             if b:IsA("TextButton") and b.Text == prevName then
                 if selectedBtn then selectedBtn.BackgroundColor3 = Color3.fromRGB(35,35,50) end
-                b.BackgroundColor3 = Color3.fromRGB(70,90,200)
+                b.BackgroundColor3 = Color3.fromRGB(80,90,200)
                 selectedBtn = b
                 break
             end
@@ -281,4 +273,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Version finale GitHub - Liste complète + scroll OK")
+print("Seylix AP - Version finale : liste complète + scroll OK")
