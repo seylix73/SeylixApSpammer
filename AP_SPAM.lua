@@ -1,3 +1,6 @@
+-- Seylix AP - Version finale (18 février 2026)
+-- Scroll complet corrigé, minimize fixe, esthétique + drapeau Algérie
+
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
 local TCS = game:GetService("TextChatService")
@@ -10,7 +13,7 @@ local hrp = char:WaitForChild("HumanoidRootPart", 8)
 local selectedPlayerName = nil
 local selectedBtn = nil
 
--- GUI esthétique
+-- GUI
 local sg = Instance.new("ScreenGui")
 sg.Name = "SeylixAP"
 sg.ResetOnSpawn = false
@@ -66,7 +69,7 @@ local flag = Instance.new("ImageLabel")
 flag.Size = UDim2.new(0, 40, 0, 30)
 flag.Position = UDim2.new(0, 15, 0.5, -15)
 flag.BackgroundTransparency = 1
-flag.Image = "rbxassetid://9423183864"
+flag.Image = "rbxassetid://9423183864" -- Drapeau Algérie
 flag.ScaleType = Enum.ScaleType.Fit
 flag.Parent = titleBar
 
@@ -123,14 +126,14 @@ execGradient.Color = ColorSequence.new{
 execGradient.Rotation = 45
 execGradient.Parent = execBtn
 
--- ScrollingFrame sans AutomaticCanvasSize (buggé)
+-- ScrollingFrame
 local scroll = Instance.new("ScrollingFrame")
 scroll.Size = UDim2.new(1, -20, 0.58, -60)
 scroll.Position = UDim2.new(0, 10, 0.18, 10)
 scroll.BackgroundTransparency = 1
 scroll.ScrollBarThickness = 4
 scroll.ScrollBarImageColor3 = Color3.fromRGB(100,100,220)
-scroll.CanvasSize = UDim2.new(0, 0, 0, 0)  -- on met à jour manuellement
+scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
 scroll.ScrollingDirection = Enum.ScrollingDirection.Y
 scroll.Parent = mf
 
@@ -196,11 +199,12 @@ UIS.InputBegan:Connect(function(i,gp)
     end
 end)
 
+-- Bouton Exécuter
 execBtn.MouseButton1Click:Connect(function()
     if selectedPlayerName then spam(selectedPlayerName) end
 end)
 
--- Boutons
+-- Création bouton
 local function createBtn(p)
     if p == lp then return end
     local b = Instance.new("TextButton")
@@ -227,15 +231,13 @@ local function createBtn(p)
     
     b.MouseButton1Click:Connect(function()
         selectedPlayerName = p.Name
-        if selectedBtn then 
-            selectedBtn.BackgroundColor3 = Color3.fromRGB(35,35,50) 
-        end
+        if selectedBtn then selectedBtn.BackgroundColor3 = Color3.fromRGB(35,35,50) end
         b.BackgroundColor3 = Color3.fromRGB(70,90,200)
         selectedBtn = b
     end)
 end
 
--- Refresh corrigé
+-- Refresh avec fix scroll
 local function refresh()
     local prevName = selectedPlayerName
     
@@ -262,9 +264,10 @@ local function refresh()
         selectedBtn = nil
     end
     
-    -- Mise à jour CanvasSize manuelle avec délai (fixe le bug "un seul joueur")
-    task.wait(0.1)  -- 0.1s suffisant pour AbsoluteContentSize à jour
-    scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 40)  -- +40 marge
+    -- Fix scroll : attendre 2 frames + marge
+    RS.RenderStepped:Wait()
+    RS.RenderStepped:Wait()
+    scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 60)
 end
 
 refresh()
@@ -278,4 +281,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Liste complète + scroll jusqu'en bas corrigé")
+print("Seylix AP - Version finale GitHub - Liste complète + scroll OK")
