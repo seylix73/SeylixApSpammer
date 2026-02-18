@@ -145,7 +145,7 @@ local function spam(targetName)
     ch:SendAsync(";inverse " .. targetName)
     
     -- Jail après 0.2s (assumant que c'est 0.2s, pas ms)
-    task.wait(1)
+    task.wait(3.3)
     ch:SendAsync(";jail " .. targetName)
 end
 
