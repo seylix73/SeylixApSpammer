@@ -143,8 +143,6 @@ local function spam(targetName)
     
     task.wait(0.15)
     ch:SendAsync(";inverse " .. targetName)
-
-    ch:SendAsync(";ragdoll " .. targetName)
     
     -- Jail après 0.2s (assumant que c'est 0.2s, pas ms)
     task.wait(3.3)
