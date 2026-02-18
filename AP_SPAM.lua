@@ -68,7 +68,7 @@ minBtn.Parent = titleBar
 
 -- Bouton Exécuter (taille fixe, reste grand même minimisé)
 local execBtn = Instance.new("TextButton")
-execBtn.Size = UDim2.new(0.92,0,0.18,0)
+execBtn.Size = UDim2.new(0.92,0,0.18,0)           -- taille fixe
 execBtn.BackgroundColor3 = Color3.fromRGB(200,30,30)
 execBtn.Text = "Exécuter sur sélectionné (F)"
 execBtn.TextScaled = true
@@ -109,20 +109,21 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize
+-- Minimize : liste disparaît, bouton Exécuter reste grand, sélection persistante
 local minimized = false
 local norm = mf.Size
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     if minimized then
         scroll.Visible = false
-        mf.Size = UDim2.new(0.38, 0, 0.18, 0)
+        mf.Size = UDim2.new(0.38, 0, 0.18, 0)   -- hauteur juste pour title + execBtn (execBtn garde 0.18)
         minBtn.Text = "+"
     else
         scroll.Visible = true
         mf.Size = norm
         minBtn.Text = "-"
     end
+    -- Sélection reste toujours (selectedPlayerName inchangé)
 end)
 
 -- Spam function
@@ -239,4 +240,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Sélection persistante corrigée")
+print("Seylix AP - Minimize corrigé, execBtn reste grand, sélection persistante")
