@@ -1,5 +1,5 @@
--- Seylix AP - Version finale GitHub (18 février 2026)
--- Liste complète + scroll jusqu'en bas, minimize fixe, esthétique clean, drapeau Algérie
+-- Seylix AP - Version finale (touche exécution modifiable)
+-- Touche par défaut : F (changeable en haut)
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
@@ -9,6 +9,9 @@ local RS = game:GetService("RunService")
 local lp = Players.LocalPlayer
 local char = lp.Character or lp.CharacterAdded:Wait()
 local hrp = char:WaitForChild("HumanoidRootPart", 8)
+
+-- Touche d'exécution (modifiable ici)
+local KEY_EXECUTE = Enum.KeyCode.F  -- ← Change F par E, Q, G, R, etc.
 
 local selectedPlayerName = nil
 local selectedBtn = nil
@@ -24,7 +27,7 @@ local mf = Instance.new("Frame")
 mf.Size = UDim2.new(0.38, 0, 0.38, 0)
 mf.Position = UDim2.new(0.5, 0, 0.5, 0)
 mf.AnchorPoint = Vector2.new(0.5, 0.5)
-mf.BackgroundColor3 = Color3.fromRGB(18, 18, 25)  -- sombre moderne
+mf.BackgroundColor3 = Color3.fromRGB(18, 18, 25)
 mf.BorderSizePixel = 0
 mf.Parent = sg
 
@@ -63,15 +66,16 @@ flag.Image = "rbxassetid://9423183864"
 flag.ScaleType = Enum.ScaleType.Fit
 flag.Parent = titleBar
 
+-- Titre toujours visible
 local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, -70, 1, 0)
-title.Position = UDim2.new(0, 65, 0, 0)
+title.Size = UDim2.new(0.6, 0, 1, 0)
+title.Position = UDim2.new(0.5, 0, 0, 0)
+title.AnchorPoint = Vector2.new(0.5, 0)
 title.BackgroundTransparency = 1
 title.Text = "Seylix AP"
 title.TextScaled = true
 title.Font = Enum.Font.GothamBlack
 title.TextColor3 = Color3.fromRGB(240,240,255)
-title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = titleBar
 
 local hue = 0
@@ -80,12 +84,13 @@ RS.Heartbeat:Connect(function(dt)
     title.TextColor3 = Color3.fromHSV(hue/360, 0.85, 1)
 end)
 
+-- Bouton Minimize stylé néon
 local minBtn = Instance.new("TextButton")
-minBtn.Size = UDim2.new(0, 36, 0, 36)
-minBtn.Position = UDim2.new(1, -45, 0.5, -18)
-minBtn.BackgroundColor3 = Color3.fromRGB(55, 55, 75)
-minBtn.Text = "-"
-minBtn.TextColor3 = Color3.fromRGB(200,200,255)
+minBtn.Size = UDim2.new(0, 40, 0, 40)
+minBtn.Position = UDim2.new(1, -50, 0.5, -20)
+minBtn.BackgroundColor3 = Color3.fromRGB(40, 200, 255)
+minBtn.Text = "−"
+minBtn.TextColor3 = Color3.fromRGB(255,255,255)
 minBtn.TextScaled = true
 minBtn.Font = Enum.Font.GothamBold
 minBtn.Parent = titleBar
@@ -94,19 +99,25 @@ local minCorner = Instance.new("UICorner")
 minCorner.CornerRadius = UDim.new(1,0)
 minCorner.Parent = minBtn
 
+local minStroke = Instance.new("UIStroke")
+minStroke.Color = Color3.fromRGB(0, 255, 255)
+minStroke.Thickness = 2
+minStroke.Transparency = 0.4
+minStroke.Parent = minBtn
+
 -- Bouton Exécuter
 local execBtn = Instance.new("TextButton")
 execBtn.Size = UDim2.new(0.92, 0, 0.18, 0)
 execBtn.Position = UDim2.new(0.04, 0, 0.78, 0)
 execBtn.BackgroundColor3 = Color3.fromRGB(220, 40, 40)
-execBtn.Text = "EXÉCUTER SUR SÉLECTION (F)"
+execBtn.Text = "EXÉCUTER (" .. KEY_EXECUTE.Name .. ")"
 execBtn.TextScaled = true
 execBtn.Font = Enum.Font.GothamBlack
 execBtn.TextColor3 = Color3.fromRGB(255,255,255)
 execBtn.Parent = mf
 
 local execCorner = Instance.new("UICorner")
-execCorner.CornerRadius = UDim.new(0, 12)
+execCorner.CornerRadius = UDim.new(0, 14)
 execCorner.Parent = execBtn
 
 local execGradient = Instance.new("UIGradient")
@@ -116,6 +127,18 @@ execGradient.Color = ColorSequence.new{
 }
 execGradient.Rotation = 45
 execGradient.Parent = execBtn
+
+-- Texte animation
+local animText = Instance.new("TextLabel")
+animText.Size = UDim2.new(1,0,1,0)
+animText.BackgroundTransparency = 1
+animText.Text = "Commandes Exécutées !"
+animText.TextScaled = true
+animText.Font = Enum.Font.GothamBlack
+animText.TextColor3 = Color3.fromRGB(255,255,255)
+animText.TextTransparency = 1
+animText.Visible = false
+animText.Parent = execBtn
 
 -- ScrollingFrame
 local scroll = Instance.new("ScrollingFrame")
@@ -133,6 +156,11 @@ scrollList.Padding = UDim.new(0.008, 0)
 scrollList.FillDirection = Enum.FillDirection.Vertical
 scrollList.SortOrder = Enum.SortOrder.LayoutOrder
 scrollList.Parent = scroll
+
+-- Mise à jour scroll
+scrollList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+    scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 50)
+end)
 
 -- Drag
 local dragging, ds, sp = false, nil, nil
@@ -157,15 +185,15 @@ UIS.InputEnded:Connect(function(i)
     end
 end)
 
--- Minimize fixe
+-- Minimize
 local minimized = false
 minBtn.MouseButton1Click:Connect(function()
     minimized = not minimized
     scroll.Visible = not minimized
-    minBtn.Text = minimized and "+" or "-"
+    minBtn.Text = minimized and "＋" or "−"
 end)
 
--- Spam rapide
+-- Spam
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
@@ -182,20 +210,60 @@ local function spam(targetName)
     ch:SendAsync(";tiny " .. targetName)
 end
 
--- Touche F
+-- Touche personnalisable + animation
 UIS.InputBegan:Connect(function(i,gp)
     if gp then return end
-    if i.KeyCode == Enum.KeyCode.F then
-        if selectedPlayerName then spam(selectedPlayerName) end
+    if i.KeyCode == KEY_EXECUTE then
+        if selectedPlayerName then 
+            spam(selectedPlayerName)
+            -- Animation arc-en-ciel
+            animText.Visible = true
+            animText.TextTransparency = 0
+            animText.TextStrokeTransparency = 0.5
+            animText.TextStrokeColor3 = Color3.fromRGB(255,255,255)
+            
+            local start = tick()
+            local conn
+            conn = RS.Heartbeat:Connect(function()
+                local t = tick() - start
+                if t > 1.2 then
+                    animText.Visible = false
+                    conn:Disconnect()
+                    return
+                end
+                local h = (t * 360) % 360
+                animText.TextColor3 = Color3.fromHSV(h/360, 1, 1)
+            end)
+        end
     end
 end)
 
--- Bouton Exécuter
+-- Bouton Exécuter + animation
 execBtn.MouseButton1Click:Connect(function()
-    if selectedPlayerName then spam(selectedPlayerName) end
+    if selectedPlayerName then 
+        spam(selectedPlayerName)
+        -- Même animation
+        animText.Visible = true
+        animText.TextTransparency = 0
+        animText.TextStrokeTransparency = 0.5
+        animText.TextStrokeColor3 = Color3.fromRGB(255,255,255)
+        
+        local start = tick()
+        local conn
+        conn = RS.Heartbeat:Connect(function()
+            local t = tick() - start
+            if t > 1.2 then
+                animText.Visible = false
+                conn:Disconnect()
+                return
+            end
+            local h = (t * 360) % 360
+            animText.TextColor3 = Color3.fromHSV(h/360, 1, 1)
+        end)
+    end
 end)
 
--- Création bouton
+-- Boutons joueurs
 local function createBtn(p)
     if p == lp then return end
     local b = Instance.new("TextButton")
@@ -228,7 +296,7 @@ local function createBtn(p)
     end)
 end
 
--- Refresh avec fix scroll
+-- Refresh
 local function refresh()
     local prevName = selectedPlayerName
     
@@ -236,8 +304,7 @@ local function refresh()
         if c:IsA("TextButton") then c:Destroy() end 
     end
     
-    local pls = Players:GetPlayers()
-    for _,p in pls do 
+    for _,p in Players:GetPlayers() do 
         createBtn(p) 
     end
     
@@ -256,7 +323,6 @@ local function refresh()
         selectedBtn = nil
     end
     
-    -- Fix scroll : attendre 2 frames + marge
     RS.RenderStepped:Wait()
     RS.RenderStepped:Wait()
     scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 60)
@@ -273,4 +339,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Version finale : liste complète + scroll OK")
+print("Seylix AP - Touche exécution modifiable (" .. KEY_EXECUTE.Name .. ")")
