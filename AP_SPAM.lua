@@ -1,9 +1,8 @@
--- Seylix AP - Version finale (touche exécution modifiable)
+-- Seylix AP - Version MAX SPEED (remote instantané)
 -- Touche par défaut : F (changeable en haut)
 
 local Players = game:GetService("Players")
 local UIS = game:GetService("UserInputService")
-local TCS = game:GetService("TextChatService")
 local RS = game:GetService("RunService")
 
 local lp = Players.LocalPlayer
@@ -15,6 +14,33 @@ local KEY_EXECUTE = Enum.KeyCode.F  -- ← Change F par E, Q, G, R, etc.
 
 local selectedPlayerName = nil
 local selectedBtn = nil
+
+-- Recherche du remote admin (max speed)
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local adminRemote = nil
+
+task.spawn(function()
+    local start = tick()
+    while tick() - start < 8 do
+        local packages = ReplicatedStorage:FindFirstChild("Packages")
+        if packages then
+            local net = packages:FindFirstChild("Net")
+            if net then
+                adminRemote = net:FindFirstChild("RE/AdminPanelService/ExecuteCommand")
+                if adminRemote and adminRemote:IsA("RemoteEvent") then
+                    print("✅ Remote trouvé ! Spam ULTRA-RAPIDE activé (instantané)")
+                    break
+                end
+            end
+        end
+        task.wait(0.1)
+    end
+    
+    if not adminRemote then
+        warn("⚠️ Remote ExecuteCommand non trouvé → fallback chat (lent)")
+        warn("Achète le gamepass admin ou trouve le vrai remote avec spy")
+    end
+end)
 
 -- GUI esthétique
 local sg = Instance.new("ScreenGui")
@@ -84,7 +110,7 @@ RS.Heartbeat:Connect(function(dt)
     title.TextColor3 = Color3.fromHSV(hue/360, 0.85, 1)
 end)
 
--- Bouton Minimize stylé néon
+-- Bouton Minimize néon
 local minBtn = Instance.new("TextButton")
 minBtn.Size = UDim2.new(0, 40, 0, 40)
 minBtn.Position = UDim2.new(1, -50, 0.5, -20)
@@ -157,7 +183,6 @@ scrollList.FillDirection = Enum.FillDirection.Vertical
 scrollList.SortOrder = Enum.SortOrder.LayoutOrder
 scrollList.Parent = scroll
 
--- Mise à jour scroll
 scrollList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
     scroll.CanvasSize = UDim2.new(0, 0, 0, scrollList.AbsoluteContentSize.Y + 50)
 end)
@@ -193,56 +218,25 @@ minBtn.MouseButton1Click:Connect(function()
     minBtn.Text = minimized and "＋" or "−"
 end)
 
--- Spam
+-- Spam MAX SPEED via remote
 local function spam(targetName)
     if not targetName or targetName == "" then return end
     
-    local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
-    if not ch then warn("Canal introuvable") return end
-
-    ch:SendAsync(";balloon " .. targetName)
-    ch:SendAsync(";rocket " .. targetName)
+    local targetPlayer = Players:FindFirstChild(targetName)
+    if not targetPlayer then 
+        warn("Joueur non trouvé : " .. targetName)
+        return 
+    end
     
-    task.wait(0.09)
-    ch:SendAsync(";inverse " .. targetName)
-    
-    task.wait(0.09)
-    ch:SendAsync(";tiny " .. targetName)
-end
-
--- Touche personnalisable + animation
-UIS.InputBegan:Connect(function(i,gp)
-    if gp then return end
-    if i.KeyCode == KEY_EXECUTE then
-        if selectedPlayerName then 
-            spam(selectedPlayerName)
-            -- Animation arc-en-ciel
-            animText.Visible = true
-            animText.TextTransparency = 0
-            animText.TextStrokeTransparency = 0.5
-            animText.TextStrokeColor3 = Color3.fromRGB(255,255,255)
-            
-            local start = tick()
-            local conn
-            conn = RS.Heartbeat:Connect(function()
-                local t = tick() - start
-                if t > 1.2 then
-                    animText.Visible = false
-                    conn:Disconnect()
-                    return
-                end
-                local h = (t * 360) % 360
-                animText.TextColor3 = Color3.fromHSV(h/360, 1, 1)
+    if adminRemote then
+        -- Spam instantané (aucun wait !)
+        for _, cmd in ipairs({"balloon", "rocket", "inverse", "tiny"}) do
+            pcall(function()
+                adminRemote:FireServer(targetPlayer, cmd)
             end)
         end
-    end
-end)
-
--- Bouton Exécuter + animation
-execBtn.MouseButton1Click:Connect(function()
-    if selectedPlayerName then 
-        spam(selectedPlayerName)
-        -- Même animation
+        
+        -- Animation arc-en-ciel
         animText.Visible = true
         animText.TextTransparency = 0
         animText.TextStrokeTransparency = 0.5
@@ -260,6 +254,36 @@ execBtn.MouseButton1Click:Connect(function()
             local h = (t * 360) % 360
             animText.TextColor3 = Color3.fromHSV(h/360, 1, 1)
         end)
+    else
+        -- Fallback chat (lent) si remote pas trouvé
+        warn("Remote non trouvé - utilisation chat lent")
+        local TCS = game:GetService("TextChatService")
+        local ch = TCS.TextChannels:FindFirstChild("RBXGeneral")
+        if ch then
+            ch:SendAsync(";balloon " .. targetName)
+            ch:SendAsync(";rocket " .. targetName)
+            task.wait(0.05)  -- minimisé au max
+            ch:SendAsync(";inverse " .. targetName)
+            task.wait(0.05)
+            ch:SendAsync(";tiny " .. targetName)
+        end
+    end
+end
+
+-- Touche personnalisable + animation
+UIS.InputBegan:Connect(function(i,gp)
+    if gp then return end
+    if i.KeyCode == KEY_EXECUTE then
+        if selectedPlayerName then 
+            spam(selectedPlayerName)
+        end
+    end
+end)
+
+-- Bouton Exécuter + animation
+execBtn.MouseButton1Click:Connect(function()
+    if selectedPlayerName then 
+        spam(selectedPlayerName)
     end
 end)
 
@@ -339,4 +363,4 @@ lp.CharacterAdded:Connect(function(nc)
     hrp = nc:WaitForChild("HumanoidRootPart", 5)
 end)
 
-print("Seylix AP - Touche exécution modifiable (" .. KEY_EXECUTE.Name .. ")")
+print("Seylix AP - MAX SPEED : remote ExecuteCommand (instantané si gamepass admin)")
